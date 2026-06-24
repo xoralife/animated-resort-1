@@ -193,21 +193,38 @@ body {
   pointer-events: auto;
 }
 
+.hero-subtitle {
+  font-size: 0.85rem;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 15px;
+}
+
 .hero-content h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 5rem;
+  font-size: 5.5rem;
   color: var(--white);
-  letter-spacing: 8px;
-  margin-bottom: 15px;
-  text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  letter-spacing: 10px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+}
+
+.hero-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  margin: 0 auto 20px;
 }
 
 .hero-content p {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--gold);
   letter-spacing: 6px;
   text-transform: uppercase;
   margin-bottom: 60px;
+  font-weight: 300;
 }
 
 .scroll-indicator {
@@ -216,10 +233,10 @@ body {
 
 .scroll-indicator span {
   display: block;
-  font-size: 0.75rem;
-  letter-spacing: 3px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 10px;
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 12px;
 }
 
 .scroll-arrow {
@@ -229,6 +246,7 @@ body {
   border-bottom: 2px solid var(--gold);
   transform: rotate(45deg);
   margin: 0 auto;
+  opacity: 0.7;
 }
 
 @keyframes float {
@@ -247,108 +265,195 @@ body {
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.panel-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 60px;
+  background: var(--gold);
+  border-radius: 0 0 3px 0;
 }
 
 .section-panel h2 {
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   color: var(--gold);
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   letter-spacing: 3px;
 }
 
 .section-panel p {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 12px;
+}
+
+.panel-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--gold) !important;
+  margin-bottom: 20px;
+  padding-left: 15px;
+  border-left: 2px solid rgba(200, 169, 126, 0.3);
+}
+
+/* About Stats */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(200, 169, 126, 0.15);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* Menu */
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 30px;
+  gap: 25px;
 }
 
 .menu-category h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: var(--gold);
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(200, 169, 126, 0.3);
+  border-bottom: 1px solid rgba(200, 169, 126, 0.2);
 }
 
 .menu-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
+  align-items: flex-start;
+  padding: 6px 0;
+  gap: 15px;
+}
+
+.item-name {
+  display: block;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2px;
+}
+
+.item-desc {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 300;
 }
 
 .menu-item .price {
   color: var(--gold);
   font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 /* Gallery */
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 12px;
 }
 
 .gallery-item {
   aspect-ratio: 16/10;
-  background: rgba(200, 169, 126, 0.1);
   border: 1px solid rgba(200, 169, 126, 0.2);
   border-radius: 4px;
   overflow: hidden;
-}
-
-.gallery-placeholder {
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+  border-color: var(--gold);
+}
+
+.gallery-label {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 /* Reservation Form */
 .reservation-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 12px;
 }
 
 .reservation-form input,
-.reservation-form textarea {
+.reservation-form textarea,
+.reservation-form select {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(200, 169, 126, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(200, 169, 126, 0.2);
   border-radius: 4px;
   color: var(--white);
   font-family: 'Poppins', sans-serif;
-  font-size: 0.9rem;
-  transition: border-color 0.3s ease;
+  font-size: 0.85rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.reservation-form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c8a97e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.reservation-form select option {
+  background: #1a1a1a;
+  color: white;
 }
 
 .reservation-form input:focus,
-.reservation-form textarea:focus {
+.reservation-form textarea:focus,
+.reservation-form select:focus {
   outline: none;
   border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .reservation-form textarea {
@@ -362,17 +467,17 @@ body {
   border: none;
   border-radius: 4px;
   font-family: 'Poppins', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .reservation-form button:hover {
-  background: #b89a6e;
-  transform: translateY(-2px);
+  background: #d4b68a;
+  transform: translateY(-1px);
 }
 
 /* Contact */
@@ -380,48 +485,98 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(200, 169, 126, 0.08);
+  border-radius: 50%;
 }
 
 .contact-item h4 {
   font-family: 'Playfair Display', serif;
   color: var(--gold);
-  margin-bottom: 8px;
-  font-size: 1rem;
+  margin-bottom: 2px;
+  font-size: 0.9rem;
 }
 
 .contact-item p {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.contact-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .social-links {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.social-links a {
+.social-link {
   color: var(--gold);
   text-decoration: none;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   transition: color 0.3s ease;
+  padding: 8px 12px;
+  border: 1px solid rgba(200, 169, 126, 0.15);
+  border-radius: 4px;
+  text-align: center;
 }
 
-.social-links a:hover {
+.social-link:hover {
   color: var(--cream);
+  border-color: rgba(200, 169, 126, 0.4);
+  background: rgba(200, 169, 126, 0.05);
+}
+
+.map-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 1px dashed rgba(200, 169, 126, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
 }
 
 .footer {
   text-align: center;
   padding-top: 20px;
-  border-top: 1px solid rgba(200, 169, 126, 0.2);
+  border-top: 1px solid rgba(200, 169, 126, 0.1);
 }
 
 .footer p {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 0;
 }
 
 /* Scrollbar */
