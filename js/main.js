@@ -32,8 +32,8 @@ renderer.toneMappingExposure = 1.2;
 renderer.outputEncoding = THREE.sRGBEncoding;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0d0d0d);
-scene.fog = new THREE.Fog(0x0d0d0d, 30, 60);
+scene.background = new THREE.Color(0x0a0806);
+scene.fog = new THREE.FogExp2(0x0a0806, 0.018);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 4, 12);
@@ -1151,7 +1151,16 @@ window.addEventListener('scroll', () => {
   const scrollHeight = document.body.scrollHeight - window.innerHeight;
   if (scrollHeight <= 0) return;
   targetProgress = Math.min(window.scrollY / scrollHeight, 1);
+  // Update progress bar
+  const bar = document.querySelector('.progress-bar-fill');
+  if (bar) bar.style.width = (targetProgress * 100) + '%';
 });
+
+// === SCROLL PROGRESS BAR ===
+const bar = document.createElement('div');
+bar.className = 'progress-bar-fill';
+bar.style.cssText = 'position:fixed;top:0;left:0;width:0%;height:2px;background:linear-gradient(90deg,#c8a97e,#e8c99e);z-index:1000;transition:width 0.1s ease';
+document.body.appendChild(bar);
 
 // === NAV LINKS ===
 document.querySelectorAll('.nav-links a').forEach(link => {
