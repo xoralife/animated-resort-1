@@ -888,6 +888,98 @@ createTopiary(6, -5);
 
 updateLoading(85);
 
+// === CAMERA PATH ===
+const pathPoints = [
+  new THREE.Vector3(0, 2, 12),
+  new THREE.Vector3(0, 2.2, 8),
+  new THREE.Vector3(0, 2, 4),
+  new THREE.Vector3(0, 2.2, 0),
+  new THREE.Vector3(0, 2, -4),
+  new THREE.Vector3(0, 2.2, -8),
+  new THREE.Vector3(0, 1.8, -10.5),
+];
+const cameraCurve = new THREE.CatmullRomCurve3(pathPoints);
+
+const sceneLabel = document.getElementById('scene-label');
+const sceneNames = ['Reception', 'Dining Hall', 'Dining Hall', 'Kitchen', 'Kitchen', 'Garden Patio', 'Garden Patio'];
+const sceneZones = [0, 2, 4, -2, -4, -8, -10.5];
+
+let t = 0;
+let targetT = 0;
+let phi = 0;
+let theta = 0;
+let isDragging = false;
+let prevMouse = { x: 0, y: 0 };
+
+function getSceneLabel(tVal) {
+  const idx = Math.round(tVal * (sceneNames.length - 1));
+  return sceneNames[Math.min(idx, sceneNames.length - 1)];
+}
+
+function updateCamera(tVal) {
+  const pos = cameraCurve.getPoint(tVal);
+  camera.position.copy(pos);
+  const lookAt = new THREE.Vector3(0, 1.5, 0);
+  if (tVal > 0.6) {
+    lookAt.z = -4;
+  } else if (tVal < 0.2) {
+    lookAt.z = 4;
+  }
+  camera.lookAt(lookAt);
+
+  const label = getSceneLabel(tVal);
+  sceneLabel.textContent = label;
+  sceneLabel.style.opacity = '0.5';
+}
+
+// === SCROLL CONTROLS ===
+let scrollAccum = 0;
+window.addEventListener('wheel', (e) => {
+  scrollAccum += e.deltaY * 0.0004;
+  scrollAccum = Math.max(0, Math.min(1, scrollAccum));
+  targetT = scrollAccum;
+});
+
+// === MOUSE DRAG ===
+canvas.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  prevMouse.x = e.clientX;
+  prevMouse.y = e.clientY;
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - prevMouse.x;
+  const dy = e.clientY - prevMouse.y;
+  phi -= dx * 0.005;
+  theta = Math.max(-0.5, Math.min(0.5, theta + dy * 0.005));
+  prevMouse.x = e.clientX;
+  prevMouse.y = e.clientY;
+});
+
+window.addEventListener('mouseup', () => { isDragging = false; });
+
+// === TOUCH DRAG ===
+canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    prevMouse.x = e.touches[0].clientX;
+    prevMouse.y = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (!isDragging || e.touches.length !== 1) return;
+  const dx = e.touches[0].clientX - prevMouse.x;
+  const dy = e.touches[0].clientY - prevMouse.y;
+  phi -= dx * 0.005;
+  theta = Math.max(-0.5, Math.min(0.5, theta + dy * 0.005));
+  prevMouse.x = e.touches[0].clientX;
+  prevMouse.y = e.touches[0].clientY;
+}, { passive: true });
+
+canvas.addEventListener('touchend', () => { isDragging = false; }, { passive: true });
+
 // === RESIZE ===
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -895,17 +987,38 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// === SCENE LABEL ===
-const sceneLabel = document.getElementById('scene-label');
-const sceneNames = ['Reception', 'Dining Hall', 'Kitchen', 'Garden Patio'];
-let currentSceneIdx = 0;
+// === PROGRESS BAR ===
+const progressFill = document.querySelector('.progress-fill');
 
 // === ANIMATION ===
 function animate() {
   requestAnimationFrame(animate);
+
+  // smooth scroll interpolation
+  t += (targetT - t) * 0.06;
+
+  // base camera position
+  updateCamera(t);
+
+  // apply orbit offset
+  const basePos = cameraCurve.getPoint(t);
+  const offset = new THREE.Vector3(
+    Math.sin(phi) * 1.5,
+    theta * 1.5,
+    0
+  );
+  camera.position.copy(basePos.clone().add(offset));
+
+  const lookAt = new THREE.Vector3(0, 1.5, 0);
+  if (t > 0.6) lookAt.z = -4;
+  else if (t < 0.2) lookAt.z = 4;
+  camera.lookAt(lookAt);
+
+  progressFill.style.width = (t * 100) + '%';
+
   renderer.render(scene, camera);
 }
 animate();
 
 sceneReady();
-console.log('The Grand Resort - Three.js 3D Scene with Procedural Textures');
+console.log('The Grand Resort - Three.js 3D Scene with Controls');
