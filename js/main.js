@@ -541,17 +541,150 @@ const glass = new THREE.Mesh(new THREE.PlaneGeometry(8, 2.5), glassMat);
 glass.position.set(0, 1.25, -1.5);
 scene.add(glass);
 
-// counter in kitchen area
-const kitchenCounter = new THREE.Mesh(
-  new THREE.BoxGeometry(2, 1, 0.6),
-  new THREE.MeshStandardMaterial({ map: genMetal(128, '#888888'), roughness: 0.3, metalness: 0.7 })
-);
-kitchenCounter.position.set(-3, 0.5, -4.5);
-kitchenCounter.castShadow = true;
-kitchenCounter.receiveShadow = true;
-scene.add(kitchenCounter);
+// === KITCHEN AREA ===
+const ssMat = new THREE.MeshStandardMaterial({
+  map: genMetal(128, '#a0a0a0'),
+  roughness: 0.2,
+  metalness: 0.8,
+});
+const ssMatDark = new THREE.MeshStandardMaterial({
+  color: 0x444444,
+  roughness: 0.3,
+  metalness: 0.7,
+});
 
-updateLoading(85);
+// main prep counter
+const prepCounter = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 0.7), ssMat);
+prepCounter.position.set(-3.5, 0.5, -4.5);
+prepCounter.castShadow = true;
+prepCounter.receiveShadow = true;
+scene.add(prepCounter);
+
+// second counter
+const prepCounter2 = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1, 0.7), ssMat);
+prepCounter2.position.set(3.5, 0.5, -4.5);
+prepCounter2.castShadow = true;
+prepCounter2.receiveShadow = true;
+scene.add(prepCounter2);
+
+// fridge
+function buildFridge(x, z) {
+  const fridgeMat = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, roughness: 0.1, metalness: 0.6 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.1, metalness: 0.5 });
+  const f = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.6, 0.7), fridgeMat);
+  f.position.set(x, 0.8, z);
+  f.castShadow = true;
+  f.receiveShadow = true;
+  scene.add(f);
+  // door
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.4, 0.04), doorMat);
+  door.position.set(x + 0.001, 0.8, z - 0.38);
+  scene.add(door);
+  // handle
+  const handle = new THREE.Mesh(
+    new THREE.BoxGeometry(0.3, 0.02, 0.03),
+    ssMatDark
+  );
+  handle.position.set(x, 0.8, z - 0.4);
+  scene.add(handle);
+}
+buildFridge(-5, -4);
+
+// stove
+function buildStove(x, z) {
+  const stoveMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.2, metalness: 0.8 });
+  const stove = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.85, 0.7), stoveMat);
+  stove.position.set(x, 0.425, z);
+  stove.castShadow = true;
+  stove.receiveShadow = true;
+  scene.add(stove);
+  // burners
+  for (let bi = -0.18; bi <= 0.18; bi += 0.36) {
+    for (let bj = -0.18; bj <= 0.18; bj += 0.36) {
+      const burner = new THREE.Mesh(
+        new THREE.TorusGeometry(0.06, 0.008, 6, 12),
+        ssMatDark
+      );
+      burner.position.set(x + bi, 0.86, z + bj);
+      burner.rotation.x = Math.PI / 2;
+      scene.add(burner);
+    }
+  }
+  // exhaust hood
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.15, 0.5), ssMat);
+  hood.position.set(x, 1.6, z);
+  scene.add(hood);
+  const hoodPipe = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.8, 0.15), ssMat);
+  hoodPipe.position.set(x, 2.08, z);
+  scene.add(hoodPipe);
+}
+buildStove(-1.5, -4);
+
+// sink
+function buildSink(x, z) {
+  const sinkMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.05, metalness: 0.9 });
+  const sink = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, 0.5), sinkMat);
+  sink.position.set(x, 1.03, z);
+  scene.add(sink);
+  // basin
+  const basin = new THREE.Mesh(
+    new THREE.BoxGeometry(0.4, 0.1, 0.35),
+    new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.1, metalness: 0.7 })
+  );
+  basin.position.set(x, 0.97, z);
+  scene.add(basin);
+  // faucet
+  const faucetMat = new THREE.MeshStandardMaterial({ color: 0xc8a97e, roughness: 0.2, metalness: 0.7 });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.04, 8), faucetMat);
+  base.position.set(x + 0.15, 1.06, z);
+  scene.add(base);
+  const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.12, 8), faucetMat);
+  spout.position.set(x + 0.15, 1.14, z);
+  spout.rotation.x = 0.3;
+  scene.add(spout);
+}
+buildSink(1, -4.5);
+
+// upper shelves
+function buildShelves(x, z, count) {
+  const shelfMat = new THREE.MeshStandardMaterial({ color: 0x6a5a4a, roughness: 0.7 });
+  for (let i = 0; i < count; i++) {
+    const s = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.03, 0.25), shelfMat);
+    s.position.set(x, 1.6 + i * 0.35, z);
+    scene.add(s);
+    // plates on shelf
+    for (let p = -0.3; p <= 0.3; p += 0.2) {
+      const plate = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.07, 0.02, 10),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
+      );
+      plate.position.set(x + p, 1.62 + i * 0.35, z + 0.02);
+      scene.add(plate);
+    }
+  }
+}
+buildShelves(-5.5, -2.5, 3);
+buildShelves(5.5, -2.5, 3);
+
+// hanging pots
+function buildPots(x, z) {
+  const potMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.3, metalness: 0.5 });
+  for (let i = -0.4; i <= 0.4; i += 0.4) {
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.1, 8), potMat);
+    pot.position.set(x + i, 1.6, z);
+    scene.add(pot);
+    const handle = new THREE.Mesh(
+      new THREE.TorusGeometry(0.04, 0.008, 4, 8),
+      ssMatDark
+    );
+    handle.position.set(x + i, 1.67, z);
+    handle.rotation.x = Math.PI / 2;
+    scene.add(handle);
+  }
+}
+buildPots(2.5, -2);
+
+updateLoading(75);
 
 // === PLANTERS (garden) ===
 function createPlanter(x, z) {
