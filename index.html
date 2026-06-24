@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Grand Resort - Fine Dining Experience</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="loader">
+      <div class="loader-text">The Grand Resort</div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+      <div class="loader-percent">0%</div>
+    </div>
+  </div>
+
+  <canvas id="resort-canvas"></canvas>
+
+  <div id="scroll-container">
+    <div id="scroll-content"></div>
+  </div>
+
+  <div id="ui-overlay">
+    <nav id="navbar">
+      <div class="nav-logo">The Grand Resort</div>
+      <div class="nav-links">
+        <a href="#hero">Home</a>
+        <a href="#about">About</a>
+        <a href="#menu">Menu</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#reservation">Reserve</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+
+    <section id="hero" class="section active">
+      <div class="hero-content">
+        <h1>The Grand Resort</h1>
+        <p>A Fine Dining Experience</p>
+        <div class="scroll-indicator">
+          <span>Scroll to Explore</span>
+          <div class="scroll-arrow"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="section-panel about-panel">
+        <h2>Our Story</h2>
+        <p>Welcome to The Grand Resort, where culinary artistry meets timeless elegance. Established in 2010, we have been serving exquisite cuisine in a breathtaking 3D virtual environment.</p>
+        <p>Every detail has been crafted to provide an unforgettable dining experience — from our hand-selected ingredients to our stunning resort atmosphere.</p>
+      </div>
+    </section>
+
+    <section id="menu" class="section">
+      <div class="section-panel menu-panel">
+        <h2>Our Menu</h2>
+        <div class="menu-grid">
+          <div class="menu-category">
+            <h3>Starters</h3>
+            <div class="menu-item"><span>Bruschetta</span><span class="price">$12</span></div>
+            <div class="menu-item"><span>Caesar Salad</span><span class="price">$14</span></div>
+            <div class="menu-item"><span>Soup of the Day</span><span class="price">$10</span></div>
+          </div>
+          <div class="menu-category">
+            <h3>Main Course</h3>
+            <div class="menu-item"><span>Grilled Salmon</span><span class="price">$28</span></div>
+            <div class="menu-item"><span>Filet Mignon</span><span class="price">$42</span></div>
+            <div class="menu-item"><span>Lobster Risotto</span><span class="price">$36</span></div>
+          </div>
+          <div class="menu-category">
+            <h3>Desserts</h3>
+            <div class="menu-item"><span>Tiramisu</span><span class="price">$12</span></div>
+            <div class="menu-item"><span>Crème Brûlée</span><span class="price">$14</span></div>
+            <div class="menu-item"><span>Chocolate Fondant</span><span class="price">$16</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section">
+      <div class="section-panel gallery-panel">
+        <h2>Gallery</h2>
+        <div class="gallery-grid">
+          <div class="gallery-item"><div class="gallery-placeholder">Interior View</div></div>
+          <div class="gallery-item"><div class="gallery-placeholder">Fine Dining</div></div>
+          <div class="gallery-item"><div class="gallery-placeholder">Garden Area</div></div>
+          <div class="gallery-item"><div class="gallery-placeholder">Chef's Special</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reservation" class="section">
+      <div class="section-panel reservation-panel">
+        <h2>Make a Reservation</h2>
+        <form class="reservation-form">
+          <div class="form-row">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Email Address" required>
+          </div>
+          <div class="form-row">
+            <input type="tel" placeholder="Phone Number" required>
+            <input type="number" placeholder="Guests" min="1" max="20" required>
+          </div>
+          <div class="form-row">
+            <input type="date" required>
+            <input type="time" required>
+          </div>
+          <textarea placeholder="Special Requests" rows="3"></textarea>
+          <button type="submit">Reserve Now</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="section-panel contact-panel">
+        <h2>Contact Us</h2>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="contact-item">
+              <h4>Address</h4>
+              <p>123 Resort Avenue, Paradise City</p>
+            </div>
+            <div class="contact-item">
+              <h4>Phone</h4>
+              <p>+1 (555) 123-4567</p>
+            </div>
+            <div class="contact-item">
+              <h4>Hours</h4>
+              <p>Mon-Sun: 11AM - 11PM</p>
+            </div>
+          </div>
+          <div class="social-links">
+            <a href="#">Instagram</a>
+            <a href="#">Facebook</a>
+            <a href="#">TripAdvisor</a>
+          </div>
+        </div>
+        <footer class="footer">
+          <p>&copy; 2026 The Grand Resort. All rights reserved.</p>
+        </footer>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
