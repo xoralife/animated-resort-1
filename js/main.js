@@ -72,18 +72,69 @@ const fillLight = new THREE.DirectionalLight(0x8888ff, 0.3);
 fillLight.position.set(-5, 3, -5);
 scene.add(fillLight);
 
+// === PROCEDURAL WOOD TEXTURE ===
+function createWoodTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  const colors = ['#3d2b1f', '#4a3525', '#2a1f14', '#5c4033'];
+  for (let i = 0; i < 60; i++) {
+    const y = i * 8.5 + Math.random() * 4;
+    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+    ctx.fillRect(0, y, 512, 7 + Math.random() * 3);
+  }
+
+  // Grain lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 120; i++) {
+    const y = Math.random() * 512;
+    ctx.beginPath();
+    ctx.moveTo(0, y + Math.random() * 2);
+    for (let x = 0; x < 512; x += 20) {
+      ctx.lineTo(x, y + Math.sin(x * 0.02 + Math.random()) * 2);
+    }
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(15, 20);
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tex;
+}
+
 // === FLOOR ===
 const floorGeo = new THREE.PlaneGeometry(30, 40);
 const floorMat = new THREE.MeshStandardMaterial({
-  color: 0x2a1f14,
-  roughness: 0.6,
-  metalness: 0.1,
+  map: createWoodTexture(),
+  roughness: 0.5,
+  metalness: 0.05,
 });
 const floor = new THREE.Mesh(floorGeo, floorMat);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.01;
 floor.receiveShadow = true;
 scene.add(floor);
+
+// Area rug near counter
+function createRug(cx, cz, w, h, color) {
+  const rugGeo = new THREE.PlaneGeometry(w, h);
+  const rugMat = new THREE.MeshStandardMaterial({
+    color: color,
+    roughness: 0.9,
+    side: THREE.DoubleSide,
+  });
+  const rug = new THREE.Mesh(rugGeo, rugMat);
+  rug.rotation.x = -Math.PI / 2;
+  rug.position.set(cx, 0.01, cz);
+  rug.receiveShadow = true;
+  scene.add(rug);
+}
+createRug(0, 5.5, 4, 3, 0x8b0000);
 
 // === CEILING ===
 const ceilGeo = new THREE.PlaneGeometry(30, 40);
@@ -174,36 +225,147 @@ for (let i = -2; i <= 2; i++) {
   }
 }
 
-updateLoading(30);
+updateLoading(20);
 
-// === COUNTER ===
-const counterMat = new THREE.MeshStandardMaterial({
-  color: 0x8b7355,
-  roughness: 0.4,
-  metalness: 0.3,
-});
+// === PROCEDURAL MARBLE TEXTURE ===
+function createMarbleTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 30; i++) {
+    ctx.strokeStyle = `rgba(180,170,160,${Math.random() * 0.3})`;
+    ctx.lineWidth = 1 + Math.random() * 3;
+    ctx.beginPath();
+    let x = Math.random() * 256, y = Math.random() * 256;
+    ctx.moveTo(x, y);
+    for (let j = 0; j < 5; j++) {
+      x += (Math.random() - 0.5) * 60;
+      y += (Math.random() - 0.5) * 60;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(1, 1);
+  return tex;
+}
 
-const counterGeo = new THREE.BoxGeometry(3, 1.2, 1);
-const counter = new THREE.Mesh(counterGeo, counterMat);
-counter.position.set(0, 0.6, 6);
-counter.castShadow = true;
-counter.receiveShadow = true;
-scene.add(counter);
+// === RECEPTION COUNTER ===
+function createDetailedCounter() {
+  const group = new THREE.Group();
 
-// Counter top
-const counterTopGeo = new THREE.BoxGeometry(3.2, 0.08, 1.2);
-const counterTopMat = new THREE.MeshStandardMaterial({
-  color: 0x5a4a3a,
-  roughness: 0.2,
-  metalness: 0.5,
-});
-const counterTop = new THREE.Mesh(counterTopGeo, counterTopMat);
-counterTop.position.set(0, 1.24, 6);
-counterTop.castShadow = true;
-counterTop.receiveShadow = true;
-scene.add(counterTop);
+  // Main counter body
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x2a1f14,
+    roughness: 0.6,
+    metalness: 0.1,
+  });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.0, 1.2), bodyMat);
+  body.position.y = 0.5;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  group.add(body);
 
-updateLoading(50);
+  // Front panel with wood panels
+  const panelMat = new THREE.MeshStandardMaterial({
+    color: 0x3d2b1f,
+    roughness: 0.7,
+    metalness: 0.05,
+  });
+  for (let i = -1; i <= 1; i += 0.5) {
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.7, 0.05), panelMat);
+    panel.position.set(i, 0.5, 0.6);
+    panel.castShadow = true;
+    group.add(panel);
+  }
+
+  // Marble counter top
+  const marbleTex = createMarbleTexture();
+  const topMat = new THREE.MeshStandardMaterial({
+    map: marbleTex,
+    roughness: 0.15,
+    metalness: 0.3,
+  });
+  const top = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.08, 1.4), topMat);
+  top.position.y = 1.04;
+  top.castShadow = true;
+  top.receiveShadow = true;
+  group.add(top);
+
+  // Gold trim
+  const trimMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    roughness: 0.3,
+    metalness: 0.8,
+  });
+  const trim = new THREE.Mesh(new THREE.BoxGeometry(3.45, 0.03, 1.45), trimMat);
+  trim.position.y = 1.08;
+  group.add(trim);
+
+  group.position.set(0, 0, 6);
+  scene.add(group);
+  return group;
+}
+
+const counter = createDetailedCounter();
+
+// === RECEPTION SIGN ===
+function createReceptionSign() {
+  const signMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    emissive: 0xc8a97e,
+    emissiveIntensity: 0.1,
+    roughness: 0.3,
+    metalness: 0.8,
+  });
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 0.05), signMat);
+  sign.position.set(0, 2.0, 5.4);
+  scene.add(sign);
+}
+createReceptionSign();
+
+// === RECEPTION POTTED PLANT ===
+function createPottedPlant(x, z) {
+  const group = new THREE.Group();
+  const potMat = new THREE.MeshStandardMaterial({
+    color: 0x5c4033,
+    roughness: 0.8,
+  });
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.4, 12), potMat);
+  pot.position.y = 0.2;
+  pot.castShadow = true;
+  group.add(pot);
+
+  const stemMat = new THREE.MeshStandardMaterial({
+    color: 0x2d5a27,
+    roughness: 0.9,
+  });
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2;
+    const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), stemMat);
+    leaf.position.set(Math.cos(angle) * 0.25, 0.45 + Math.random() * 0.2, Math.sin(angle) * 0.25);
+    leaf.scale.set(1, 1.5 + Math.random(), 1);
+    group.add(leaf);
+  }
+  // Center leaves
+  for (let i = 0; i < 4; i++) {
+    const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), stemMat);
+    leaf.position.set((Math.random() - 0.5) * 0.15, 0.55 + Math.random() * 0.2, (Math.random() - 0.5) * 0.15);
+    leaf.scale.set(1, 2, 1);
+    group.add(leaf);
+  }
+
+  group.position.set(x, 0, z);
+  scene.add(group);
+}
+createPottedPlant(-1.8, 5.5);
+createPottedPlant(1.8, 5.5);
+
+updateLoading(40);
 
 // === LAMP POSTS (pillars with lights) ===
 function createLamp(x, z) {
@@ -241,7 +403,59 @@ createLamp(2, -2);
 createLamp(-2, -6);
 createLamp(2, -6);
 
-updateLoading(70);
+updateLoading(60);
+
+// === WALL DECORATIONS ===
+function createBaseboards() {
+  const bbMat = new THREE.MeshStandardMaterial({ color: 0x2a1f14, roughness: 0.7 });
+  [-15, 15].forEach(z => {
+    const bb = new THREE.Mesh(new THREE.BoxGeometry(30, 0.2, 0.05), bbMat);
+    bb.position.set(0, 0.1, z);
+    scene.add(bb);
+  });
+  [-15, 15].forEach(x => {
+    const bb = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.2, 40), bbMat);
+    bb.position.set(x, 0.1, 0);
+    scene.add(bb);
+  });
+}
+createBaseboards();
+
+// Wall panel frames
+function createWallFrames() {
+  const frameMat = new THREE.MeshStandardMaterial({
+    color: 0x8b7355,
+    roughness: 0.5,
+    metalness: 0.1,
+  });
+  // Right wall panels (-z direction)
+  for (let i = 0; i < 4; i++) {
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.03, 1.2, 0.8), frameMat);
+    panel.position.set(14.97, 2, -2 - i * 3);
+    scene.add(panel);
+  }
+  // Wall sconces
+  const sconceMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    emissive: 0xffa500,
+    emissiveIntensity: 0.15,
+    metalness: 0.8,
+    roughness: 0.3,
+  });
+  [-4, 4].forEach(x => {
+    [4, -2, -8].forEach(z => {
+      const sconce = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), sconceMat);
+      sconce.position.set(x, 2.5, z);
+      scene.add(sconce);
+      const sLight = new THREE.PointLight(0xffa500, 0.15, 3);
+      sLight.position.set(x, 2.5, z);
+      scene.add(sLight);
+    });
+  });
+}
+createWallFrames();
+
+updateLoading(75);
 
 // === SECTION CONTROLS ===
 const sections = document.querySelectorAll('.section');
