@@ -169,59 +169,157 @@ createWall(30, 5, 0, 2.5, 15, Math.PI);  // front wall
 createWall(5, 5, -15, 2.5, 0, Math.PI / 2);  // left wall
 createWall(5, 5, 15, 2.5, 0, -Math.PI / 2); // right wall
 
-// === TEST OBJECTS (placeholder furniture) ===
-function createTestTable(x, z) {
-  const tableGeo = new THREE.CylinderGeometry(0.6, 0.7, 0.8, 8);
-  const tableMat = new THREE.MeshStandardMaterial({
-    color: 0x8b7355,
-    roughness: 0.5,
-    metalness: 0.3
-  });
-  const table = new THREE.Mesh(tableGeo, tableMat);
-  table.position.set(x, 0.4, z);
-  table.castShadow = true;
-  table.receiveShadow = true;
-  scene.add(table);
+// === PROCEDURAL WOOD TEXTURE (table) ===
+function createTableWoodTexture() {
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#6b5b45'; ctx.fillRect(0, 0, 128, 128);
+  for (let i = 0; i < 20; i++) {
+    ctx.strokeStyle = `rgba(80,60,40,${Math.random() * 0.3})`;
+    ctx.lineWidth = 1 + Math.random() * 2;
+    ctx.beginPath(); ctx.moveTo(0, i * 6 + Math.random() * 3);
+    for (let x = 0; x < 128; x += 10) ctx.lineTo(x, i * 6 + Math.sin(x * 0.05) * 2);
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+}
+const tableWoodTex = createTableWoodTexture();
 
-  // Table top
-  const topGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.08, 8);
-  const topMat = new THREE.MeshStandardMaterial({
-    color: 0x6b5b45,
-    roughness: 0.4,
-    metalness: 0.2
+// === DETAILED DINING TABLE ===
+function createDiningTable(x, z) {
+  const group = new THREE.Group();
+
+  const legMat = new THREE.MeshStandardMaterial({
+    color: 0x3d2b1f,
+    roughness: 0.6,
+    metalness: 0.1,
   });
-  const top = new THREE.Mesh(topGeo, topMat);
-  top.position.set(x, 0.84, z);
+
+  // Center pedestal
+  const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.2, 0.7, 12), legMat);
+  pedestal.position.y = 0.35;
+  pedestal.castShadow = true;
+  pedestal.receiveShadow = true;
+  group.add(pedestal);
+
+  // Base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 0.08, 12), legMat);
+  base.position.y = 0.04;
+  base.receiveShadow = true;
+  group.add(base);
+
+  // Table top (wood)
+  const topMat = new THREE.MeshStandardMaterial({
+    map: tableWoodTex,
+    roughness: 0.4,
+    metalness: 0.05,
+  });
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.06, 16), topMat);
+  top.position.y = 0.73;
   top.castShadow = true;
   top.receiveShadow = true;
-  scene.add(top);
+  group.add(top);
+
+  // Cloth/runner
+  const runnerMat = new THREE.MeshStandardMaterial({
+    color: 0x8b0000,
+    roughness: 0.9,
+  });
+  const runner = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.01, 1.2), runnerMat);
+  runner.position.y = 0.76;
+  group.add(runner);
+
+  // === CENTERPIECE (vase with flower) ===
+  const vaseMat = new THREE.MeshStandardMaterial({
+    color: 0x5a7a5a,
+    roughness: 0.3,
+    metalness: 0.2,
+  });
+  const vase = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.15, 8), vaseMat);
+  vase.position.y = 0.84;
+  group.add(vase);
+
+  const flowerMat = new THREE.MeshStandardMaterial({
+    color: 0xff6b6b,
+    roughness: 0.8,
+  });
+  for (let f = 0; f < 3; f++) {
+    const angle = (f / 3) * Math.PI * 2;
+    const flower = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), flowerMat);
+    flower.position.set(Math.cos(angle) * 0.06, 0.92, Math.sin(angle) * 0.06);
+    group.add(flower);
+  }
+  const stemMat = new THREE.MeshStandardMaterial({ color: 0x2d5a27 });
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.08, 4), stemMat);
+  stem.position.y = 0.88;
+  group.add(stem);
+
+  group.position.set(x, 0, z);
+  scene.add(group);
 }
 
-function createTestChair(x, z, rot) {
-  const chairGeo = new THREE.BoxGeometry(0.4, 0.4, 0.3);
-  const chairMat = new THREE.MeshStandardMaterial({
+// === DETAILED DINING CHAIR ===
+function createDiningChair(x, z, rot) {
+  const group = new THREE.Group();
+
+  const woodMat = new THREE.MeshStandardMaterial({
     color: 0x4a3520,
     roughness: 0.7,
   });
-  const chair = new THREE.Mesh(chairGeo, chairMat);
-  chair.position.set(x, 0.2, z);
-  chair.rotation.y = rot || 0;
-  chair.castShadow = true;
-  chair.receiveShadow = true;
-  scene.add(chair);
+  const cushionMat = new THREE.MeshStandardMaterial({
+    color: 0x8b0000,
+    roughness: 0.9,
+  });
+
+  // 4 legs
+  const legPos = [[-0.15, 0, -0.15], [0.15, 0, -0.15], [-0.15, 0, 0.15], [0.15, 0, 0.15]];
+  legPos.forEach(([lx, ly, lz]) => {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.025, 0.3, 6), woodMat);
+    leg.position.set(lx, 0.15, lz);
+    leg.castShadow = true;
+    group.add(leg);
+  });
+
+  // Seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.35), woodMat);
+  seat.position.y = 0.32;
+  seat.castShadow = true;
+  seat.receiveShadow = true;
+  group.add(seat);
+
+  // Cushion
+  const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.3), cushionMat);
+  cushion.position.y = 0.34;
+  group.add(cushion);
+
+  // Backrest
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.02), woodMat);
+  back.position.set(0, 0.5, -0.17);
+  back.castShadow = true;
+  group.add(back);
+
+  // Backrest cushion
+  const backCush = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.2, 0.02), cushionMat);
+  backCush.position.set(0, 0.5, -0.16);
+  group.add(backCush);
+
+  group.position.set(x, 0, z);
+  group.rotation.y = rot || 0;
+  scene.add(group);
 }
 
-// Place tables in dining area
+// === PLACE FURNITURE ===
 for (let i = -2; i <= 2; i++) {
   for (let j = 0; j <= 3; j++) {
     if (i === 0 && j === 0) continue;
     const x = i * 2.5;
     const z = j * 2.5 - 2;
-    createTestTable(x, z);
-    createTestChair(x + 0.6, z + 0.5, 0);
-    createTestChair(x - 0.6, z - 0.5, Math.PI);
-    createTestChair(x + 0.6, z - 0.5, Math.PI / 2);
-    createTestChair(x - 0.6, z + 0.5, -Math.PI / 2);
+    createDiningTable(x, z);
+    createDiningChair(x + 0.6, z + 0.5, 0);
+    createDiningChair(x - 0.6, z - 0.5, Math.PI);
+    createDiningChair(x + 0.6, z - 0.5, Math.PI / 2);
+    createDiningChair(x - 0.6, z + 0.5, -Math.PI / 2);
   }
 }
 
