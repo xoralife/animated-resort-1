@@ -1072,7 +1072,165 @@ if (reserveForm) {
   });
 }
 
-// === ANIMATION ===
+// === AUDIO AMBIANCE ===
+let audioCtx = null;
+let ambienceGain = null;
+let isAudioStarted = false;
+
+function startAudio() {
+  if (isAudioStarted) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+
+    // master gain
+    ambienceGain = audioCtx.createGain();
+    ambienceGain.gain.setValueAtTime(0.08, now);
+    ambienceGain.connect(audioCtx.destination);
+
+    // low drone
+    const osc1 = audioCtx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(55, now);
+    const gain1 = audioCtx.createGain();
+    gain1.gain.setValueAtTime(0.3, now);
+    osc1.connect(gain1);
+    gain1.connect(ambienceGain);
+    osc1.start();
+
+    // high shimmer
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(220, now);
+    const gain2 = audioCtx.createGain();
+    gain2.gain.setValueAtTime(0.05, now);
+    osc2.connect(gain2);
+    gain2.connect(ambienceGain);
+    osc2.start();
+
+    // noise generator via buffer
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(0.015, now);
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(400, now);
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(ambienceGain);
+    noise.start();
+
+    isAudioStarted = true;
+  } catch (e) {
+    console.log('Audio not available');
+  }
+}
+
+// start audio on first user interaction
+function initAudio() {
+  if (!isAudioStarted) startAudio();
+  document.removeEventListener('click', initAudio);
+  document.removeEventListener('touchstart', initAudio);
+}
+document.addEventListener('click', initAudio);
+document.addEventListener('touchstart', initAudio);
+
+// === INFO HOTSPOTS ===
+const hotspots = [];
+function createHotspot(x, y, z, label) {
+  const dotMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    emissive: 0xffa500,
+    emissiveIntensity: 0.3,
+  });
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), dotMat);
+  dot.position.set(x, y, z);
+  scene.add(dot);
+
+  // glow ring
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.08, 0.1, 16),
+    new THREE.MeshBasicMaterial({
+      color: 0xc8a97e,
+      transparent: true,
+      opacity: 0.4,
+      side: THREE.DoubleSide,
+    })
+  );
+  ring.position.set(x, y, z);
+  ring.lookAt(camera.position);
+  scene.add(ring);
+
+  const data = { dot, ring, label, x, y, z };
+  hotspots.push(data);
+  return data;
+}
+
+const hotspotData = [
+  { x: 0, y: 1.8, z: 4.5, label: 'Reception Desk — Welcome to The Grand Resort' },
+  { x: 0, y: 0.9, z: 1, label: 'Dining Hall — Fine dining experience' },
+  { x: -3, y: 1.2, z: -4.5, label: 'Kitchen — Culinary excellence' },
+  { x: 0, y: 1.0, z: -8, label: 'Garden Fountain — Relax and unwind' },
+];
+
+hotspotData.forEach(h => createHotspot(h.x, h.y, h.z, h.label));
+
+// hotspot tooltip HTML
+const tooltip = document.createElement('div');
+tooltip.id = 'hotspot-tooltip';
+tooltip.style.cssText = 'position:fixed;background:rgba(10,8,6,0.85);backdrop-filter:blur(10px);border:1px solid rgba(200,169,126,0.3);border-radius:3px;padding:8px 14px;color:#fff;font-family:Cormorant Garamond,serif;font-size:0.85rem;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:200;white-space:nowrap;letter-spacing:0.5px;';
+document.body.appendChild(tooltip);
+
+// hotspot interaction
+function updateHotspots() {
+  const camPos = camera.position;
+  let closestDist = Infinity;
+  let closestLabel = '';
+  let closestScreen = null;
+
+  hotspots.forEach(h => {
+    const dist = camPos.distanceTo(new THREE.Vector3(h.x, h.y, h.z));
+    const visible = dist < 3;
+    h.ring.material.opacity = visible ? 0.6 : 0.15;
+    h.dot.material.emissiveIntensity = visible ? 0.6 : 0.2;
+
+    if (visible && dist < closestDist) {
+      closestDist = dist;
+      closestLabel = h.label;
+      const vec = new THREE.Vector3(h.x, h.y, h.z);
+      vec.project(camera);
+      closestScreen = {
+        x: (vec.x * 0.5 + 0.5) * window.innerWidth,
+        y: (-vec.y * 0.5 + 0.5) * window.innerHeight,
+      };
+    }
+  });
+
+  if (closestScreen && closestDist < 2.5) {
+    tooltip.style.opacity = '1';
+    tooltip.textContent = closestLabel;
+    tooltip.style.left = closestScreen.x + 'px';
+    tooltip.style.top = (closestScreen.y - 40) + 'px';
+  } else {
+    tooltip.style.opacity = '0';
+  }
+}
+
+// rotate hotspot rings to face camera in animate loop
+function animateHotspots() {
+  hotspots.forEach(h => {
+    h.ring.lookAt(camera.position);
+    h.ring.rotation.x += Math.PI / 2;
+  });
+}
 function animate() {
   requestAnimationFrame(animate);
 
@@ -1099,6 +1257,9 @@ function animate() {
   progressFill.style.width = (t * 100) + '%';
 
   updateSections(t);
+
+  updateHotspots();
+  animateHotspots();
 
   renderer.render(scene, camera);
 }
