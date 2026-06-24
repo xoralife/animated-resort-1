@@ -686,43 +686,207 @@ buildPots(2.5, -2);
 
 updateLoading(75);
 
-// === PLANTERS (garden) ===
-function createPlanter(x, z) {
-  const potMat = new THREE.MeshStandardMaterial({
-    color: 0x5a4a3a,
-    roughness: 0.8,
-  });
-  const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.3, 8), potMat);
-  pot.position.set(x, 0.15, z);
-  pot.castShadow = true;
-  pot.receiveShadow = true;
-  scene.add(pot);
+// === GARDEN/PATIO ===
+const foliageMat = new THREE.MeshStandardMaterial({
+  color: 0x2a5a2a,
+  roughness: 0.9,
+});
+const trunkMat = new THREE.MeshStandardMaterial({
+  color: 0x4a3520,
+  roughness: 0.9,
+});
 
-  const leafMat = new THREE.MeshStandardMaterial({
-    color: 0x2a5a2a,
-    roughness: 0.9,
-  });
-  for (let i = 0; i < 5; i++) {
-    const leaf = new THREE.Mesh(
-      new THREE.SphereGeometry(0.08 + Math.random() * 0.06, 6, 6),
-      leafMat
+function createTree(x, z, scale) {
+  scale = scale || 1;
+  const s = new THREE.Mesh(new THREE.CylinderGeometry(0.04 * scale, 0.08 * scale, 0.4 * scale, 6), trunkMat);
+  s.position.set(x, 0.2 * scale, z);
+  s.castShadow = true;
+  scene.add(s);
+  const crown = new THREE.Mesh(new THREE.SphereGeometry(0.2 * scale, 8, 8), foliageMat);
+  crown.position.set(x, 0.5 * scale + 0.15 * scale, z);
+  crown.scale.y = 0.7;
+  crown.castShadow = true;
+  scene.add(crown);
+  // extra foliage clumps
+  for (let fi = 0; fi < 4; fi++) {
+    const clump = new THREE.Mesh(new THREE.SphereGeometry(0.12 * scale, 6, 6), foliageMat);
+    clump.position.set(
+      x + (Math.random() - 0.5) * 0.25 * scale,
+      0.5 * scale + (Math.random() - 0.2) * 0.2 * scale,
+      z + (Math.random() - 0.5) * 0.25 * scale
     );
-    leaf.position.set(
-      x + (Math.random() - 0.5) * 0.3,
-      0.35 + Math.random() * 0.2,
-      z + (Math.random() - 0.5) * 0.3
-    );
-    leaf.scale.y = 0.4 + Math.random() * 0.3;
-    scene.add(leaf);
+    scene.add(clump);
   }
 }
 
-createPlanter(-6, -3);
-createPlanter(6, -3);
-createPlanter(-6, -5);
-createPlanter(6, -5);
+function createShrub(x, z) {
+  const sh = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), foliageMat);
+  sh.position.set(x, 0.1, z);
+  sh.scale.y = 0.5;
+  scene.add(sh);
+  const sh2 = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), foliageMat);
+  sh2.position.set(x + 0.08, 0.08, z + 0.06);
+  sh2.scale.y = 0.5;
+  scene.add(sh2);
+}
 
-updateLoading(95);
+// trees along garden edge
+for (let t = -8; t <= -6; t += 1.2) {
+  createTree(t, -8, 0.8 + Math.random() * 0.4);
+  createTree(-t, -8, 0.8 + Math.random() * 0.4);
+}
+for (let t = -8; t <= -6; t += 1.2) {
+  createTree(t, -9.5, 0.8 + Math.random() * 0.4);
+  createTree(-t, -9.5, 0.8 + Math.random() * 0.4);
+}
+
+// shrubs along walls
+for (let sx = -8; sx <= 8; sx += 1.5) {
+  createShrub(sx, -9);
+  createShrub(sx, -9.8);
+}
+
+// === FOUNTAIN ===
+function buildFountain(x, z) {
+  const stoneMat = new THREE.MeshStandardMaterial({
+    color: 0x8a8a8a,
+    roughness: 0.9,
+  });
+  const stoneDark = new THREE.MeshStandardMaterial({
+    color: 0x6a6a6a,
+    roughness: 0.9,
+  });
+
+  // base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 0.15, 12), stoneMat);
+  base.position.set(x, 0.075, z);
+  base.receiveShadow = true;
+  scene.add(base);
+
+  // tier 1
+  const tier1 = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 0.1, 12), stoneDark);
+  tier1.position.set(x, 0.25, z);
+  scene.add(tier1);
+
+  // tier 2
+  const tier2 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.1, 12), stoneMat);
+  tier2.position.set(x, 0.45, z);
+  scene.add(tier2);
+
+  // pillar
+  const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.3, 8), stoneDark);
+  pillar.position.set(x, 0.65, z);
+  scene.add(pillar);
+
+  // top bowl
+  const bowl = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), stoneMat);
+  bowl.position.set(x, 0.82, z);
+  bowl.scale.y = 0.4;
+  scene.add(bowl);
+
+  // water (decorative blue disc)
+  const waterMat = new THREE.MeshPhysicalMaterial({
+    color: 0x4a8aaa,
+    transparent: true,
+    opacity: 0.3,
+    roughness: 0.1,
+    metalness: 0,
+  });
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.01, 12), waterMat);
+  water.position.set(x, 0.31, z);
+  scene.add(water);
+
+  const water2 = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.01, 12), waterMat);
+  water2.position.set(x, 0.51, z);
+  scene.add(water2);
+
+  // point light for ambiance
+  const fl = new THREE.PointLight(0x88bbdd, 0.2, 2);
+  fl.position.set(x, 0.5, z);
+  scene.add(fl);
+}
+buildFountain(0, -8);
+
+// === STONE PATH ===
+const stoneMat = new THREE.MeshStandardMaterial({ color: 0x7a7a6a, roughness: 0.9 });
+for (let st = 0; st < 4; st++) {
+  const stone = new THREE.Mesh(
+    new THREE.CircleGeometry(0.15 + Math.random() * 0.1, 6),
+    stoneMat
+  );
+  stone.rotation.x = -Math.PI / 2;
+  stone.position.set((Math.random() - 0.5) * 0.4, 0.005, -5.5 - st * 0.7);
+  scene.add(stone);
+}
+
+// === GARDEN BENCH ===
+function buildBench(x, z, rot) {
+  const grp = new THREE.Group();
+  grp.position.set(x, 0, z);
+  grp.rotation.y = rot || 0;
+
+  const woodMat = new THREE.MeshStandardMaterial({
+    color: 0x5a4030,
+    roughness: 0.8,
+  });
+  const metalMat = new THREE.MeshStandardMaterial({
+    color: 0x333333,
+    roughness: 0.4,
+    metalness: 0.7,
+  });
+
+  // seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.04, 0.35), woodMat);
+  seat.position.set(0, 0.22, 0);
+  seat.castShadow = true;
+  grp.add(seat);
+
+  // back
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.3, 0.03), woodMat);
+  back.position.set(0, 0.4, -0.2);
+  grp.add(back);
+
+  // legs
+  for (let lx of [-0.35, 0.35]) {
+    for (let lz of [-0.15, 0.15]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.22, 6), metalMat);
+      leg.position.set(lx, 0.11, lz);
+      grp.add(leg);
+    }
+  }
+
+  // armrests
+  for (let side of [-0.38, 0.38]) {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.08, 0.35), woodMat);
+    arm.position.set(side, 0.3, -0.02);
+    grp.add(arm);
+  }
+
+  scene.add(grp);
+}
+buildBench(-5, -6.5, -0.3);
+buildBench(5, -6.5, 0.3);
+
+// === TOPIARY ===
+function createTopiary(x, z) {
+  const potMat = new THREE.MeshStandardMaterial({ color: 0x5a4a3a, roughness: 0.8 });
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.15, 8), potMat);
+  pot.position.set(x, 0.075, z);
+  pot.castShadow = true;
+  scene.add(pot);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), foliageMat);
+  ball.position.set(x, 0.25, z);
+  scene.add(ball);
+  const ball2 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), foliageMat);
+  ball2.position.set(x, 0.38, z);
+  scene.add(ball2);
+}
+createTopiary(-6, -3);
+createTopiary(6, -3);
+createTopiary(-6, -5);
+createTopiary(6, -5);
+
+updateLoading(85);
 
 // === RESIZE ===
 window.addEventListener('resize', () => {
