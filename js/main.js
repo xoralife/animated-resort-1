@@ -17,7 +17,7 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1;
+renderer.toneMappingExposure = 0.7;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -31,29 +31,57 @@ camera.lookAt(0, 1.5, 0);
 function sceneReady() { updateLoading(100); }
 
 // === LIGHTS ===
-const ambient = new THREE.AmbientLight(0x404060, 0.4);
-scene.add(ambient);
+// warm fog
+scene.fog = new THREE.FogExp2(0x0a0806, 0.012);
 
-const warmAmbient = new THREE.AmbientLight(0xff8844, 0.1);
+// hemisphere for natural ambient
+const hemi = new THREE.HemisphereLight(0x404060, 0x202030, 0.5);
+scene.add(hemi);
+
+const warmAmbient = new THREE.AmbientLight(0xff8844, 0.08);
 scene.add(warmAmbient);
 
-const mainLight = new THREE.DirectionalLight(0xffe4b5, 1.0);
+// main directional (moonlight/warm)
+const mainLight = new THREE.DirectionalLight(0xffe4b5, 0.8);
 mainLight.position.set(8, 12, 6);
 mainLight.castShadow = true;
-mainLight.shadow.mapSize.width = 1024;
-mainLight.shadow.mapSize.height = 1024;
-const d = 12;
+mainLight.shadow.mapSize.width = 2048;
+mainLight.shadow.mapSize.height = 2048;
+const d = 14;
 mainLight.shadow.camera.left = -d;
 mainLight.shadow.camera.right = d;
 mainLight.shadow.camera.top = d;
 mainLight.shadow.camera.bottom = -d;
 mainLight.shadow.camera.near = 1;
-mainLight.shadow.camera.far = 20;
+mainLight.shadow.camera.far = 25;
+mainLight.shadow.bias = -0.001;
 scene.add(mainLight);
 
-const fill = new THREE.DirectionalLight(0x8888ff, 0.15);
+// fill light
+const fill = new THREE.DirectionalLight(0x8888aa, 0.12);
 fill.position.set(-5, 3, -5);
 scene.add(fill);
+
+// reception spot
+const spot = new THREE.SpotLight(0xffddaa, 0.3);
+spot.position.set(0, 3.5, 5.5);
+spot.target.position.set(0, 0, 4);
+spot.angle = 0.5;
+spot.penumbra = 0.5;
+spot.decay = 1;
+spot.distance = 8;
+scene.add(spot);
+scene.add(spot.target);
+
+// ceiling glow (reception)
+const ceilingGlow = new THREE.PointLight(0xff8844, 0.15, 6);
+ceilingGlow.position.set(0, 3, 5);
+scene.add(ceilingGlow);
+
+// garden moonlight
+const moon = new THREE.DirectionalLight(0x8888cc, 0.15);
+moon.position.set(-5, 8, -10);
+scene.add(moon);
 
 updateLoading(15);
 
