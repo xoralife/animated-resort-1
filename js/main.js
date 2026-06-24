@@ -111,34 +111,130 @@ for (let i = -10; i <= 10; i += 1.5) {
 updateLoading(35);
 
 // === RECEPTION COUNTER ===
-const counterMat = new THREE.MeshStandardMaterial({
-  map: genDarkWood(),
-  roughness: 0.5,
-  metalness: 0.1,
-});
-const counter = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.1, 1), counterMat);
-counter.position.set(0, 0.55, 4.5);
-counter.castShadow = true;
-counter.receiveShadow = true;
-scene.add(counter);
+function buildReception() {
+  const woodMat = new THREE.MeshStandardMaterial({
+    map: genDarkWood(),
+    roughness: 0.5,
+    metalness: 0.1,
+  });
+  const marbleMat = new THREE.MeshStandardMaterial({
+    map: genMarble(512),
+    roughness: 0.15,
+    metalness: 0.1,
+  });
+  const trimMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    roughness: 0.3,
+    metalness: 0.4,
+  });
 
-const counterTopMat = new THREE.MeshStandardMaterial({
-  map: genMarble(512),
-  roughness: 0.15,
-  metalness: 0.1,
-});
-const counterTop = new THREE.Mesh(new THREE.BoxGeometry(3.7, 0.06, 1.2), counterTopMat);
-counterTop.position.set(0, 1.11, 4.5);
-counterTop.castShadow = true;
-scene.add(counterTop);
+  // main counter body
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.9, 1.2), woodMat);
+  body.position.set(0, 0.45, 4.5);
+  body.castShadow = true;
+  body.receiveShadow = true;
+  scene.add(body);
 
-// counter front panel
-const counterFront = new THREE.Mesh(
-  new THREE.BoxGeometry(3.5, 0.15, 0.03),
-  new THREE.MeshStandardMaterial({ color: 0xc8a97e, roughness: 0.3, metalness: 0.4 })
+  // upper tier (raised section)
+  const upper = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.3, 0.8), woodMat);
+  upper.position.set(0.8, 0.9, 4.5);
+  upper.castShadow = true;
+  scene.add(upper);
+
+  // marble top
+  const top = new THREE.Mesh(new THREE.BoxGeometry(4, 0.05, 1.4), marbleMat);
+  top.position.set(0, 1.125, 4.5);
+  top.castShadow = true;
+  scene.add(top);
+
+  // gold trim strip
+  const trim = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.04, 0.04), trimMat);
+  trim.position.set(0, 0.9, 5.11);
+  scene.add(trim);
+  const trim2 = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.04, 0.04), trimMat);
+  trim2.position.set(0, 0.9, 3.89);
+  scene.add(trim2);
+
+  // decorative front panel
+  for (let i = -1.4; i <= 1.4; i += 1.4) {
+    const panel = new THREE.Mesh(
+      new THREE.BoxGeometry(0.9, 0.4, 0.04),
+      new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.7 })
+    );
+    panel.position.set(i, 0.5, 5.11);
+    scene.add(panel);
+    const border = new THREE.Mesh(
+      new THREE.BoxGeometry(1.0, 0.02, 0.05),
+      trimMat
+    );
+    border.position.set(i, 0.3, 5.12);
+    scene.add(border);
+    border.position.set(i, 0.7, 5.12);
+    scene.add(border);
+  }
+
+  // bell on counter
+  const bellMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e,
+    roughness: 0.2,
+    metalness: 0.7,
+  });
+  const bellBase = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.02, 12), bellMat);
+  bellBase.position.set(-1.1, 1.16, 4.3);
+  scene.add(bellBase);
+  const bellDome = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), bellMat);
+  bellDome.position.set(-1.1, 1.2, 4.3);
+  bellDome.scale.y = 0.5;
+  scene.add(bellDome);
+
+  // small vase with flower
+  const vaseMat = new THREE.MeshStandardMaterial({
+    color: 0x8a7a6a,
+    roughness: 0.3,
+    metalness: 0.2,
+  });
+  const vase = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.045, 0.1, 8), vaseMat);
+  vase.position.set(1.4, 1.15, 4.3);
+  scene.add(vase);
+  const flowerMat = new THREE.MeshStandardMaterial({ color: 0xe8d4c8, roughness: 0.8 });
+  for (let fi = 0; fi < 4; fi++) {
+    const f = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), flowerMat);
+    f.position.set(1.4 + (Math.random() - 0.5) * 0.06, 1.25 + Math.random() * 0.08, 4.3 + (Math.random() - 0.5) * 0.06);
+    scene.add(f);
+  }
+
+  // wall sign behind counter
+  const signMat = new THREE.MeshStandardMaterial({ color: 0xc8a97e, roughness: 0.2, metalness: 0.5 });
+  const signBg = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.12, 0.02), signMat);
+  signBg.position.set(0, 2.2, 5.51);
+  scene.add(signBg);
+  const signText = new THREE.Mesh(
+    new THREE.BoxGeometry(0.001, 0.001, 0.001),
+    new THREE.MeshBasicMaterial({ visible: false })
+  );
+  signText.position.set(0, 2.2, 5.53);
+  scene.add(signText);
+}
+
+buildReception();
+
+// rug in front of counter
+const rugMat = new THREE.MeshStandardMaterial({
+  map: genFabric(128, '#8a1a1a', '#6a0a0a'),
+  roughness: 0.9,
+});
+const rug = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 1.5), rugMat);
+rug.rotation.x = -Math.PI / 2;
+rug.position.set(0, 0.002, 3.5);
+rug.receiveShadow = true;
+scene.add(rug);
+const rugTrim = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.6, 1.6),
+  new THREE.MeshStandardMaterial({ color: 0xc8a97e, roughness: 0.3, side: THREE.DoubleSide })
 );
-counterFront.position.set(0, 1.0, 5.01);
-scene.add(counterFront);
+rugTrim.rotation.x = -Math.PI / 2;
+rugTrim.position.set(0, 0.001, 3.5);
+scene.add(rugTrim);
 
 updateLoading(45);
 
