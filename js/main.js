@@ -41,12 +41,14 @@ camera.lookAt(0, 2, 0);
 
 // === CAMERA PATH ===
 const pathPoints = [
-  new THREE.Vector3(0, 4, 12),    // 0% - Counter/Reception
-  new THREE.Vector3(0, 3.5, 6),   // 20% - Entering dining
-  new THREE.Vector3(-1, 3, 0),    // 40% - Middle dining
-  new THREE.Vector3(1, 3, -4),    // 60% - Kitchen view
-  new THREE.Vector3(0, 3.5, -8),  // 80% - Garden transition
-  new THREE.Vector3(0, 5, -12)    // 100% - Final view
+  new THREE.Vector3(0, 4, 12),      // 0% - Counter/Reception
+  new THREE.Vector3(0, 3.8, 8),     // 12% - Past counter
+  new THREE.Vector3(-1, 3.2, 4),    // 25% - Entering dining
+  new THREE.Vector3(0, 3, 0),       // 40% - Middle dining
+  new THREE.Vector3(1.2, 3, -4),    // 55% - Far dining
+  new THREE.Vector3(0, 3.2, -7.5),  // 70% - At glass partition
+  new THREE.Vector3(-1.5, 4, -10),  // 85% - Side kitchen view
+  new THREE.Vector3(0, 5, -12.5)    // 100% - Inside kitchen
 ];
 
 const cameraPath = new THREE.CatmullRomCurve3(pathPoints);
@@ -554,6 +556,208 @@ function createWallFrames() {
 createWallFrames();
 
 updateLoading(75);
+
+// === KITCHEN VIEW AREA ===
+// Glass partition wall
+function createGlassPartition() {
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x88ccff,
+    transparent: true,
+    opacity: 0.25,
+    roughness: 0.05,
+    metalness: 0.0,
+    clearcoat: 0.3,
+    side: THREE.DoubleSide,
+    envMapIntensity: 0.5,
+  });
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.5), glassMat);
+  glass.position.set(0, 1.75, -8.5);
+  scene.add(glass);
+
+  // Glass frame
+  const frameMat = new THREE.MeshStandardMaterial({
+    color: 0x333333,
+    roughness: 0.5,
+    metalness: 0.8,
+  });
+  // Horizontal rails
+  [-0.5, 1.75, 3.5].forEach(y => {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(10.2, 0.05, 0.05), frameMat);
+    rail.position.set(0, y, -8.5);
+    scene.add(rail);
+  });
+  // Vertical mullions
+  [-4, 0, 4].forEach(x => {
+    const mull = new THREE.Mesh(new THREE.BoxGeometry(0.05, 3.5, 0.05), frameMat);
+    mull.position.set(x, 1.75, -8.5);
+    scene.add(mull);
+  });
+}
+createGlassPartition();
+
+// Kitchen floor (different tile)
+function createKitchenFloor() {
+  const tileCanvas = document.createElement('canvas');
+  tileCanvas.width = 128; tileCanvas.height = 128;
+  const tCtx = tileCanvas.getContext('2d');
+  tCtx.fillStyle = '#4a4a4a'; tCtx.fillRect(0, 0, 128, 128);
+  tCtx.strokeStyle = '#555555'; tCtx.lineWidth = 1;
+  for (let i = 0; i < 8; i++) {
+    tCtx.beginPath(); tCtx.moveTo(i * 16, 0); tCtx.lineTo(i * 16, 128); tCtx.stroke();
+    tCtx.beginPath(); tCtx.moveTo(0, i * 16); tCtx.lineTo(128, i * 16); tCtx.stroke();
+  }
+  const tileTex = new THREE.CanvasTexture(tileCanvas);
+  tileTex.wrapS = tileTex.wrapT = THREE.RepeatWrapping;
+  tileTex.repeat.set(4, 3);
+
+  const floorMat = new THREE.MeshStandardMaterial({
+    map: tileTex,
+    roughness: 0.7,
+    metalness: 0.1,
+  });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.set(0, 0.01, -11);
+  floor.receiveShadow = true;
+  scene.add(floor);
+}
+createKitchenFloor();
+
+// Kitchen counters and equipment
+function createKitchen() {
+  const stainlessMat = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    roughness: 0.3,
+    metalness: 0.9,
+  });
+  const counterMat = new THREE.MeshStandardMaterial({
+    color: 0x666666,
+    roughness: 0.4,
+    metalness: 0.7,
+  });
+  const tileMat = new THREE.MeshStandardMaterial({
+    color: 0xf0e8e0,
+    roughness: 0.8,
+  });
+
+  // Back wall (tiled)
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.5), tileMat);
+  backWall.position.set(0, 1.75, -13.5);
+  scene.add(backWall);
+
+  // Main counter
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(8, 0.9, 1.5), counterMat);
+  counter.position.set(0, 0.45, -12);
+  counter.castShadow = true;
+  counter.receiveShadow = true;
+  scene.add(counter);
+
+  // Stainless steel top
+  const top = new THREE.Mesh(new THREE.BoxGeometry(8.2, 0.05, 1.7), stainlessMat);
+  top.position.set(0, 0.92, -12);
+  top.receiveShadow = true;
+  scene.add(top);
+
+  // Stove (hob)
+  const stoveMat = new THREE.MeshStandardMaterial({
+    color: 0x222222,
+    roughness: 0.2,
+    metalness: 0.9,
+  });
+  const stove = new THREE.Mesh(new THREE.BoxGeometry(2, 0.02, 0.8), stoveMat);
+  stove.position.set(0, 0.95, -12);
+  scene.add(stove);
+
+  // Burner rings
+  const burnerMat = new THREE.MeshStandardMaterial({
+    color: 0x444444,
+    roughness: 0.5,
+    metalness: 0.8,
+  });
+  [-0.5, 0.5].forEach(x => {
+    [-0.2, 0.2].forEach(z => {
+      const burner = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 8, 12), burnerMat);
+      burner.position.set(x, 0.96, z - 12);
+      burner.rotation.x = -Math.PI / 2;
+      scene.add(burner);
+    });
+  });
+
+  // Ventilation hood
+  const hoodMat = new THREE.MeshStandardMaterial({
+    color: 0x777777,
+    roughness: 0.3,
+    metalness: 0.9,
+  });
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.5, 0.8), hoodMat);
+  hood.position.set(0, 2.2, -12);
+  scene.add(hood);
+  const hoodPipe = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.8, 0.3), hoodMat);
+  hoodPipe.position.set(0, 2.6, -12);
+  scene.add(hoodPipe);
+
+  // Sink
+  const sinkMat = new THREE.MeshStandardMaterial({
+    color: 0x999999,
+    roughness: 0.1,
+    metalness: 0.9,
+  });
+  const sink = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.04, 0.6), sinkMat);
+  sink.position.set(2.5, 0.95, -12);
+  scene.add(sink);
+
+  // Shelves above counter
+  const shelfMat = new THREE.MeshStandardMaterial({
+    color: 0x555555,
+    roughness: 0.5,
+    metalness: 0.6,
+  });
+  for (let i = 0; i < 3; i++) {
+    const shelf = new THREE.Mesh(new THREE.BoxGeometry(2, 0.03, 0.6), shelfMat);
+    shelf.position.set(-3 + i * 3, 2.2, -11);
+    scene.add(shelf);
+
+    // Items on shelf (plates)
+    const plateMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.3,
+    });
+    for (let p = 0; p < 3; p++) {
+      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.01, 12), plateMat);
+      plate.position.set(-3 + i * 3 + (p - 1) * 0.3, 2.22, -11);
+      scene.add(plate);
+    }
+  }
+
+  // Hanging lights over kitchen
+  const kLightMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffeedd,
+    emissiveIntensity: 0.3,
+  });
+  [-2, 2].forEach(x => {
+    const kl = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), kLightMat);
+    kl.position.set(x, 4.5, -12);
+    scene.add(kl);
+    const kLight = new THREE.PointLight(0xffeedd, 0.2, 4);
+    kLight.position.set(x, 4.5, -12);
+    scene.add(kLight);
+  });
+
+  // Kitchen sign
+  const signMat = new THREE.MeshStandardMaterial({
+    color: 0xff4444,
+    emissive: 0xff2222,
+    emissiveIntensity: 0.05,
+    roughness: 0.3,
+  });
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 0.03), signMat);
+  sign.position.set(0, 3.2, -8.3);
+  scene.add(sign);
+}
+createKitchen();
+
+updateLoading(82);
 
 // === SECTION CONTROLS ===
 const sections = document.querySelectorAll('.section');
