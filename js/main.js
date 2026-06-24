@@ -1018,6 +1018,60 @@ window.addEventListener('resize', () => {
 // === PROGRESS BAR ===
 const progressFill = document.querySelector('.progress-fill');
 
+// === UI SECTIONS ===
+const sections = document.querySelectorAll('.section');
+const sectionTMap = { 'hero': 0, 'about': 0.15, 'menu': 0.35, 'gallery': 0.55, 'reservation': 0.75, 'contact': 0.9 };
+
+function updateSections(tVal) {
+  let activeSection = 'hero';
+  for (const [id, threshold] of Object.entries(sectionTMap)) {
+    if (tVal >= threshold) activeSection = id;
+  }
+  sections.forEach(s => {
+    s.classList.toggle('active', s.id === activeSection);
+  });
+  // nav links
+  document.querySelectorAll('.nav-link').forEach(a => {
+    a.classList.toggle('active-link', a.getAttribute('href') === '#' + activeSection);
+  });
+}
+
+// nav click - smooth scroll to section
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const href = link.getAttribute('href');
+    const targetT = sectionTMap[href.substring(1)];
+    if (targetT !== undefined) {
+      scrollAccum = targetT;
+    }
+    // close mobile menu
+    document.querySelector('.nav-links').classList.remove('open');
+    document.querySelector('.menu-toggle').classList.remove('open');
+  });
+});
+
+// mobile menu toggle
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+  document.querySelector('.nav-links').classList.toggle('open');
+  document.querySelector('.menu-toggle').classList.toggle('open');
+});
+
+// === RESERVATION FORM ===
+const reserveForm = document.getElementById('reserve-form');
+if (reserveForm) {
+  reserveForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    document.getElementById('form-success').classList.remove('hidden');
+    reserveForm.style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('form-success').classList.add('hidden');
+      reserveForm.style.display = 'flex';
+      reserveForm.reset();
+    }, 4000);
+  });
+}
+
 // === ANIMATION ===
 function animate() {
   requestAnimationFrame(animate);
@@ -1043,6 +1097,8 @@ function animate() {
   camera.lookAt(lookAt);
 
   progressFill.style.width = (t * 100) + '%';
+
+  updateSections(t);
 
   renderer.render(scene, camera);
 }
