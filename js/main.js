@@ -1007,18 +1007,28 @@ window.addEventListener('resize', () => {
 // === ANIMATION LOOP ===
 let scrollProgress = 0;
 let targetProgress = 0;
+let time = 0;
 
 function animate() {
   requestAnimationFrame(animate);
+  time += 0.005;
 
   // Smooth scroll interpolation
-  scrollProgress += (targetProgress - scrollProgress) * 0.05;
+  scrollProgress += (targetProgress - scrollProgress) * 0.06;
 
   // Move camera along path
   const pathPos = cameraPath.getPoint(scrollProgress);
-  const pathLook = cameraPath.getPoint(Math.min(scrollProgress + 0.01, 1));
+  const pathLook = cameraPath.getPoint(Math.min(scrollProgress + 0.02, 1));
   camera.position.copy(pathPos);
-  camera.lookAt(pathLook);
+
+  // Natural head sway while looking
+  const sway = Math.sin(time * 0.5) * 0.3;
+  const lookTarget = new THREE.Vector3(
+    pathLook.x + sway * 0.3,
+    pathLook.y + Math.sin(time * 0.3) * 0.1,
+    pathLook.z
+  );
+  camera.lookAt(lookTarget);
 
   // Section switching based on scroll
   const sectionCount = sections.length;
