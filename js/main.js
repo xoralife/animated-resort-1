@@ -1151,13 +1151,13 @@ function createHotspot(x, y, z, label) {
     emissive: 0xffa500,
     emissiveIntensity: 0.3,
   });
-  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), dotMat);
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 10), dotMat);
   dot.position.set(x, y, z);
   scene.add(dot);
 
   // glow ring
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.08, 0.1, 16),
+    new THREE.RingGeometry(0.12, 0.16, 24),
     new THREE.MeshBasicMaterial({
       color: 0xc8a97e,
       transparent: true,
