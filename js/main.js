@@ -589,6 +589,107 @@ createWallFrames();
 
 updateLoading(75);
 
+// === LIGHTING ENHANCEMENT ===
+// Central chandelier
+function createChandelier() {
+  const group = new THREE.Group();
+  const goldMat = new THREE.MeshStandardMaterial({
+    color: 0xc8a97e, roughness: 0.3, metalness: 0.8,
+  });
+  const bulbMat = new THREE.MeshStandardMaterial({
+    color: 0xffeecc, emissive: 0xffdd44, emissiveIntensity: 0.4,
+  });
+
+  // Center rod
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6), goldMat);
+  rod.position.y = -0.25;
+  group.add(rod);
+
+  // Arms
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.02, 0.02), goldMat);
+    arm.position.set(Math.cos(angle) * 0.2, -0.3, Math.sin(angle) * 0.2);
+    arm.rotation.y = -angle;
+    group.add(arm);
+
+    // Bulb
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), bulbMat);
+    bulb.position.set(Math.cos(angle) * 0.35, -0.35, Math.sin(angle) * 0.35);
+    group.add(bulb);
+
+    // Light from each arm
+    const l = new THREE.PointLight(0xffdd44, 0.15, 4);
+    l.position.set(Math.cos(angle) * 0.35, -0.35, Math.sin(angle) * 0.35);
+    group.add(l);
+  }
+
+  // Center base
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.04, 0.04, 8), goldMat);
+  cap.position.y = 0;
+  group.add(cap);
+
+  group.position.set(0, 4.6, 0);
+  scene.add(group);
+}
+createChandelier();
+
+// Pendant lights over dining tables
+function createPendantLight(x, z) {
+  const group = new THREE.Group();
+  const metalMat = new THREE.MeshStandardMaterial({
+    color: 0x333333, roughness: 0.3, metalness: 0.9,
+  });
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.2, 12), metalMat);
+  shade.position.y = -0.1;
+  group.add(shade);
+
+  const bulbMat = new THREE.MeshStandardMaterial({
+    color: 0xffeecc, emissive: 0xffdd44, emissiveIntensity: 0.3,
+  });
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), bulbMat);
+  bulb.position.y = -0.2;
+  group.add(bulb);
+
+  const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.5, 4), metalMat);
+  wire.position.y = 0.25;
+  group.add(wire);
+
+  const light = new THREE.PointLight(0xffdd44, 0.2, 3.5);
+  light.position.set(0, -0.2, 0);
+  group.add(light);
+
+  group.position.set(x, 4.7, z);
+  scene.add(group);
+}
+
+// Place pendant lights over table clusters
+[-3.75, -1.25, 1.25, 3.75].forEach(x => {
+  [1.5, 3.5].forEach(z => {
+    createPendantLight(x, z);
+  });
+});
+
+// Counter spot light
+const spotMat = new THREE.MeshStandardMaterial({
+  color: 0x333333, roughness: 0.3, metalness: 0.9,
+});
+const spotCone = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.15, 12), spotMat);
+spotCone.position.set(0, 4.7, 5.5);
+scene.add(spotCone);
+
+const spotLight = new THREE.SpotLight(0xffeedd, 0.4);
+spotLight.position.set(0, 4.7, 5.5);
+spotLight.target.position.set(0, 1.2, 6);
+spotLight.angle = 0.4;
+spotLight.penumbra = 0.5;
+spotLight.decay = 1;
+spotLight.distance = 8;
+scene.add(spotLight);
+scene.add(spotLight.target);
+
+updateLoading(78);
+
 // === KITCHEN VIEW AREA ===
 // Glass partition wall
 function createGlassPartition() {
