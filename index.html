@@ -3,195 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Grand Resort - Fine Dining Experience</title>
+  <title>The Grand Resort - 360° Experience</title>
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="loading-screen">
     <div class="loader">
       <div class="loader-text">The Grand Resort</div>
       <div class="loader-bar"><div class="loader-fill"></div></div>
-      <div class="loader-percent">0%</div>
     </div>
   </div>
 
   <canvas id="resort-canvas"></canvas>
 
-  <div id="scroll-container">
-    <div id="scroll-content"></div>
+  <nav id="navbar">
+    <div class="nav-logo">The Grand Resort</div>
+    <div class="nav-links">
+      <a href="#hero" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#menu" class="nav-link">Menu</a>
+      <a href="#gallery" class="nav-link">Gallery</a>
+      <a href="#reservation" class="nav-link">Reserve</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    <button class="menu-toggle"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div id="scene-label">
+    <div class="scene-dot active"></div>
+    <div class="scene-dot"></div>
+    <div class="scene-dot"></div>
+    <div class="scene-dot"></div>
+    <div class="scene-label-text">Reception</div>
   </div>
 
-  <div id="ui-overlay">
-    <nav id="navbar">
-      <div class="nav-logo">The Grand Resort</div>
-      <div class="nav-links">
-        <a href="#hero" class="nav-link active-link">Home</a>
-        <a href="#about" class="nav-link">About</a>
-        <a href="#menu" class="nav-link">Menu</a>
-        <a href="#gallery" class="nav-link">Gallery</a>
-        <a href="#reservation" class="nav-link">Reserve</a>
-        <a href="#contact" class="nav-link">Contact</a>
-      </div>
-      <button class="menu-toggle" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </nav>
+  <div id="hint">Scroll to explore &bull; Drag to look around</div>
 
+  <div id="sections">
     <section id="hero" class="section active">
       <div class="hero-content">
         <div class="hero-subtitle">Welcome to</div>
-        <h1>The Grand<br>Resort</h1>
-        <div class="hero-divider"></div>
-        <p>A Fine Dining Experience</p>
-        <div class="scroll-indicator">
-          <span>Scroll to Explore</span>
+        <h1>The Grand Resort</h1>
+        <div class="hero-line"></div>
+        <p>A 360° Dining Experience</p>
+        <div class="scroll-hint">
+          <span>Scroll to begin</span>
           <div class="scroll-arrow"></div>
         </div>
       </div>
     </section>
 
     <section id="about" class="section">
-      <div class="section-panel about-panel">
+      <div class="panel">
         <div class="panel-accent"></div>
         <h2>Our Story</h2>
-        <p class="panel-quote">"Culinary artistry meets timeless elegance"</p>
-        <p>Welcome to The Grand Resort, where every meal is a masterpiece. Since 2010, we have been crafting unforgettable dining experiences in an atmosphere of refined luxury.</p>
-        <p>Our chefs source the finest ingredients from around the world, combining traditional techniques with modern innovation to create dishes that delight all senses.</p>
-        <div class="about-stats">
-          <div class="stat"><span class="stat-number">15+</span><span class="stat-label">Years</span></div>
-          <div class="stat"><span class="stat-number">50+</span><span class="stat-label">Dishes</span></div>
-          <div class="stat"><span class="stat-number">10K+</span><span class="stat-label">Guests</span></div>
-        </div>
+        <p class="quote">"Where every view tells a story"</p>
+        <p>Since 2010, The Grand Resort has redefined fine dining. Our 360° virtual tour invites you to explore every corner of our exquisite establishment before you even arrive.</p>
+        <p>From the warm glow of our reception to the serene beauty of our garden — every space tells a story of elegance and craftsmanship.</p>
       </div>
     </section>
 
     <section id="menu" class="section">
-      <div class="section-panel menu-panel">
+      <div class="panel">
         <div class="panel-accent"></div>
         <h2>Our Menu</h2>
-        <div class="menu-grid">
-          <div class="menu-category">
+        <div class="menu-items">
+          <div class="menu-cat">
             <h3>Starters</h3>
-            <div class="menu-item"><div><span class="item-name">Bruschetta</span><span class="item-desc">Tomato, basil, olive oil</span></div><span class="price">$12</span></div>
-            <div class="menu-item"><div><span class="item-name">Caesar Salad</span><span class="item-desc">Romaine, parmesan, croutons</span></div><span class="price">$14</span></div>
-            <div class="menu-item"><div><span class="item-name">Soup of the Day</span><span class="item-desc">Fresh seasonal ingredients</span></div><span class="price">$10</span></div>
-            <div class="menu-item"><div><span class="item-name">Tuna Tartare</span><span class="item-desc">Avocado, sesame, ginger</span></div><span class="price">$18</span></div>
+            <div class="mi"><span>Bruschetta</span><span class="pr">$12</span></div>
+            <div class="mi"><span>Caesar Salad</span><span class="pr">$14</span></div>
+            <div class="mi"><span>Soup of the Day</span><span class="pr">$10</span></div>
           </div>
-          <div class="menu-category">
+          <div class="menu-cat">
             <h3>Main Course</h3>
-            <div class="menu-item"><div><span class="item-name">Grilled Salmon</span><span class="item-desc">Herb crust, lemon butter</span></div><span class="price">$28</span></div>
-            <div class="menu-item"><div><span class="item-name">Filet Mignon</span><span class="item-desc">Truffle mashed potatoes</span></div><span class="price">$42</span></div>
-            <div class="menu-item"><div><span class="item-name">Lobster Risotto</span><span class="item-desc">Arborio rice, parmesan</span></div><span class="price">$36</span></div>
-            <div class="menu-item"><div><span class="item-name">Herb Chicken</span><span class="item-desc">Roasted vegetables, jus</span></div><span class="price">$24</span></div>
+            <div class="mi"><span>Grilled Salmon</span><span class="pr">$28</span></div>
+            <div class="mi"><span>Filet Mignon</span><span class="pr">$42</span></div>
+            <div class="mi"><span>Lobster Risotto</span><span class="pr">$36</span></div>
           </div>
-          <div class="menu-category">
+          <div class="menu-cat">
             <h3>Desserts</h3>
-            <div class="menu-item"><div><span class="item-name">Tiramisu</span><span class="item-desc">Coffee, mascarpone, cocoa</span></div><span class="price">$12</span></div>
-            <div class="menu-item"><div><span class="item-name">Crème Brûlée</span><span class="item-desc">Vanilla bean, caramelized</span></div><span class="price">$14</span></div>
-            <div class="menu-item"><div><span class="item-name">Chocolate Fondant</span><span class="item-desc">Molten center, ice cream</span></div><span class="price">$16</span></div>
-            <div class="menu-item"><div><span class="item-name">Cheese Platter</span><span class="item-desc">Artisan selection, honey</span></div><span class="price">$18</span></div>
+            <div class="mi"><span>Tiramisu</span><span class="pr">$12</span></div>
+            <div class="mi"><span>Crème Brûlée</span><span class="pr">$14</span></div>
+            <div class="mi"><span>Chocolate Fondant</span><span class="pr">$16</span></div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="gallery" class="section">
-      <div class="section-panel gallery-panel">
+      <div class="panel">
         <div class="panel-accent"></div>
         <h2>Gallery</h2>
         <div class="gallery-grid">
-          <div class="gallery-item" style="background: linear-gradient(135deg, #2a1f14, #4a3525);"><div class="gallery-label">Interior View</div></div>
-          <div class="gallery-item" style="background: linear-gradient(135deg, #1a2a14, #3a5a35);"><div class="gallery-label">Garden Dining</div></div>
-          <div class="gallery-item" style="background: linear-gradient(135deg, #8b0000, #4a0000);"><div class="gallery-label">Wine Cellar</div></div>
-          <div class="gallery-item" style="background: linear-gradient(135deg, #2a1a3a, #4a2a5a);"><div class="gallery-label">Private Events</div></div>
+          <div class="gallery-card" style="background:linear-gradient(135deg,#2a1f14,#4a3525)">Interior</div>
+          <div class="gallery-card" style="background:linear-gradient(135deg,#1a2a14,#3a5a35)">Garden</div>
+          <div class="gallery-card" style="background:linear-gradient(135deg,#8b0000,#4a0000)">Wine</div>
+          <div class="gallery-card" style="background:linear-gradient(135deg,#1a1a3a,#2a2a5a)">Events</div>
         </div>
       </div>
     </section>
 
     <section id="reservation" class="section">
-      <div class="section-panel reservation-panel">
+      <div class="panel">
         <div class="panel-accent"></div>
-        <h2>Make a Reservation</h2>
-        <form class="reservation-form">
-          <div class="form-row">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Email Address" required>
-          </div>
-          <div class="form-row">
-            <input type="tel" placeholder="Phone Number" required>
-            <select required>
-              <option value="" disabled selected>Number of Guests</option>
-              <option>1 Guest</option>
-              <option>2 Guests</option>
-              <option>3 Guests</option>
-              <option>4 Guests</option>
-              <option>5+ Guests</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <input type="date" required>
-            <input type="time" required>
-          </div>
-          <textarea placeholder="Special Requests (dietary restrictions, occasions...)" rows="3"></textarea>
+        <h2>Reservation</h2>
+        <form class="form">
+          <div class="form-row"><input type="text" placeholder="Name" required><input type="email" placeholder="Email" required></div>
+          <div class="form-row"><input type="tel" placeholder="Phone"><input type="number" placeholder="Guests" min="1"></div>
+          <div class="form-row"><input type="date"><input type="time"></div>
+          <textarea placeholder="Special requests..." rows="2"></textarea>
           <button type="submit">Reserve Now</button>
         </form>
       </div>
     </section>
 
     <section id="contact" class="section">
-      <div class="section-panel contact-panel">
+      <div class="panel">
         <div class="panel-accent"></div>
-        <h2>Contact Us</h2>
-        <div class="contact-grid">
-          <div class="contact-info">
-            <div class="contact-item">
-              <div class="contact-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a97e" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <div><h4>Address</h4><p>123 Resort Avenue, Paradise City</p></div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a97e" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              </div>
-              <div><h4>Phone</h4><p>+1 (555) 123-4567</p></div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a97e" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div><h4>Hours</h4><p>Mon - Sun: 11AM - 11PM</p></div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a97e" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div><h4>Email</h4><p>info@grandresort.com</p></div>
-            </div>
-          </div>
-          <div class="contact-right">
-            <div class="social-links">
-              <a href="#" class="social-link">Instagram</a>
-              <a href="#" class="social-link">Facebook</a>
-              <a href="#" class="social-link">TripAdvisor</a>
-            </div>
-            <div class="map-placeholder">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8a97e" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span>Find us on the map</span>
-            </div>
-          </div>
+        <h2>Contact</h2>
+        <div class="contact-items">
+          <div class="ci"><strong>Address</strong><span>123 Resort Ave, Paradise City</span></div>
+          <div class="ci"><strong>Phone</strong><span>+1 (555) 123-4567</span></div>
+          <div class="ci"><strong>Hours</strong><span>Mon-Sun: 11AM - 11PM</span></div>
         </div>
-        <footer class="footer">
-          <p>&copy; 2026 The Grand Resort. All rights reserved.</p>
-        </footer>
+        <div class="social">
+          <a href="#">Instagram</a>
+          <a href="#">Facebook</a>
+          <a href="#">TripAdvisor</a>
+        </div>
+        <div class="footer">&copy; 2026 The Grand Resort</div>
       </div>
     </section>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
