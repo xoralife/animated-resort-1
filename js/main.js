@@ -1162,10 +1162,25 @@ bar.className = 'progress-bar-fill';
 bar.style.cssText = 'position:fixed;top:0;left:0;width:0%;height:2px;background:linear-gradient(90deg,#c8a97e,#e8c99e);z-index:1000;transition:width 0.1s ease';
 document.body.appendChild(bar);
 
+// === MOBILE MENU TOGGLE ===
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+if (menuToggle) {
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('open');
+    navLinks.classList.toggle('open');
+  });
+}
+
 // === NAV LINKS ===
 document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
+    // Close mobile menu
+    if (menuToggle && navLinks.classList.contains('open')) {
+      menuToggle.classList.remove('open');
+      navLinks.classList.remove('open');
+    }
     const href = link.getAttribute('href');
     const sectionIndex = Array.from(sections).findIndex(s => s.id === href.replace('#', ''));
     if (sectionIndex >= 0) {
@@ -1175,6 +1190,21 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     }
   });
 });
+
+// === ACTIVE LINK TRACKING ===
+let lastActiveLink = '';
+function updateActiveLink(index) {
+  const links = document.querySelectorAll('.nav-link');
+  links.forEach((l, i) => {
+    l.classList.toggle('active-link', i === index);
+  });
+}
+// Override activateSection to include active link
+const origActivateSection = activateSection;
+activateSection = function(index) {
+  origActivateSection(index);
+  updateActiveLink(index);
+};
 
 updateLoading(100);
 console.log('The Grand Resort - 3D Experience Loaded');
